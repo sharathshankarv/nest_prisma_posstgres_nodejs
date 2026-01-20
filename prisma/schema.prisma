@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String              @id @default(uuid())
+  firstName      String
+  lastName       String
+  phone          String?             @unique
+  email          String              @unique
+  passwordHash   String
+  profileImage   String?
+  dob            DateTime?
+  emailVerified  Boolean             @default(false)
+  phoneVerified  Boolean             @default(false)
+  isActive       Boolean             @default(true)
+  additionalInfo UserAdditionalInfo?
+  lastLoginAt    DateTime?
+  roleId         String
+  role           Role                @relation(fields: [roleId], references: [id])
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  deletedAt      DateTime?
+}
+
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  users       User[]
+  description String?
+  createdAt   DateTime @default(now())
+}
+
+model UserAdditionalInfo {
+  id            String         @id @default(uuid())
+  userId        String         @unique
+  user          User           @relation(fields: [userId], references: [id])
+  addressLine1  String?
+  addressLine2  String?
+  martialStatus MaritalStatus?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+enum MaritalStatus {
+  UNMARRIED
+  MARRIED
+  DIVORCED
+}
