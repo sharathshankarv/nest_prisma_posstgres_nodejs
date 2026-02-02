@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { GetAllUserDto } from './dto/user-response.dto';
+import { GetUserDto } from './dto/user-response.dto';
 import { paginatedResponseDto } from './dto/paginated-response.dto';
 import * as bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
@@ -95,7 +95,7 @@ export class UserService {
     offset?: number;
     limit?: number;
     orderBy: sortOrder;
-  }): Promise<paginatedResponseDto<GetAllUserDto>> {
+  }): Promise<paginatedResponseDto<GetUserDto>> {
     const _orderBy = params.orderBy === 'desc' ? 'desc' : 'asc';
     const recordNumStart = Math.max(0, params.offset ?? 0);
     const recordNumEnd = Math.min(Math.max(params.limit ?? 10, 1), 100);
@@ -124,7 +124,7 @@ export class UserService {
     ]);
 
     return {
-      data: data as GetAllUserDto[],
+      data: data as GetUserDto[],
       totalCount: count,
       recordNumStart: recordNumStart,
       recordNumEnd: recordNumEnd,
