@@ -12,6 +12,9 @@ import {
 import { AuthService } from './auth.service';
 import type { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { CurrentUser } from './current-user.decorator';
+import { Roles } from './roles.decorator';
+import { RolesGuard } from './gaurds/auth.gaurds';
 
 @Controller('auth')
 export class AuthController {
@@ -54,9 +57,16 @@ export class AuthController {
     return { success: true, message: 'Login successful' };
   }
 
-  @UseGuards(AuthGuard())
+  @UseGuards(AuthGuard('jwt'))
   @Get('me')
-  me(@Req() req) {
-    return req.user;
+  me(@CurrentUser() user) {
+    return user;
+  }
+
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Get('admin-only')
+  @Roles('ADMIN')
+  adminOnly(@Req() req) {
+    return { message: 'Welcome Admin', user: req.user };
   }
 }
